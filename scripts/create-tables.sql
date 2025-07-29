@@ -1,0 +1,42 @@
+-- rooms 테이블 생성
+-- users 테이블 생성
+CREATE TABLE IF NOT EXISTS users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  room_id VARCHAR(10) NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  is_host BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS rooms (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  room_id VARCHAR(10) UNIQUE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  is_started BOOLEAN DEFAULT FALSE,
+  loser_id UUID REFERENCES users(id),
+  meme_urls TEXT[]
+);
+
+
+
+-- 인덱스 생성
+CREATE INDEX IF NOT EXISTS idx_rooms_room_id ON rooms(room_id);
+CREATE INDEX IF NOT EXISTS idx_users_room_id ON users(room_id);
+CREATE INDEX IF NOT EXISTS idx_users_is_host ON users(is_host);
+
+-- RLS (Row Level Security) 활성화
+ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
+-- 모든 사용자가 읽기 가능하도록 정책 설정
+CREATE POLICY "Anyone can read rooms" ON rooms FOR SELECT USING (true);
+CREATE POLICY "Anyone can read users" ON users FOR SELECT USING (true);
+
+-- 모든 사용자가 삽입 가능하도록 정책 설정
+CREATE POLICY "Anyone can insert rooms" ON rooms FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can insert users" ON users FOR INSERT WITH CHECK (true);
+
+-- 모든 사용자가 업데이트 가능하도록 정책 설정
+CREATE POLICY "Anyone can update rooms" ON rooms FOR UPDATE USING (true);
+CREATE POLICY "Anyone can update users" ON users FOR UPDATE USING (true);
