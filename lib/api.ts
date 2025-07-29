@@ -116,9 +116,9 @@ export async function startDraw(roomId: string, drawType: "image" | "video"): Pr
           throw new Error(error || "Video generation API error")
         }
 
-        const { video_url } = (await videoApiResponse.json()) as { videoUrl: string }
-        if (!video_url) throw new Error("Video URL not received from API.")
-        videoUrlToSave = video_url
+        const { videoUrl } = (await videoApiResponse.json()) as { videoUrl: string }
+        if (!videoUrl) throw new Error("Video URL not received from API.")
+        videoUrlToSave = videoUrl
       } catch (apiError: any) {
         clearTimeout(timeoutId)
         if (apiError.name === "AbortError") {
